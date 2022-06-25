@@ -24,6 +24,8 @@ pub mod draw_triangle_threaded_with_zbuffer_texture {
         uv_points: &UVTriplet,
         texture: &Vec<u8>,
     ) {
+
+
         let mut canvas_lock = canvas_mutex.lock().unwrap();
 
         let ss = canvas_lock.get_map();
@@ -44,17 +46,20 @@ pub mod draw_triangle_threaded_with_zbuffer_texture {
 
         let pairs = bbox_min * bbox_max;
 
-        let mut zbf = zbuffer.lock().unwrap();
 
+
+        let mut zbf = zbuffer.lock().unwrap();
         pairs
             .into_iter()
-            .map(|(i, j)| Point3(i as f64, j as f64, 0.0f64))
+            .map(|(i, j)| Point3(i as f64, j as f64, 1.0f64))
             .map(|p| (p, coords.get_barycentric_coords(p)))
             .map(|(mut p, bc)| {
                 for i in 0usize..3usize {
                     p.2 += coords[i][2] * bc[i];
                 }
                 let color = uv_points.get_color(p, coords, texture);
+
+
                 (p, color)
             })
             .for_each(
@@ -62,17 +67,15 @@ pub mod draw_triangle_threaded_with_zbuffer_texture {
                     true => {
                         zbf[p.0 as usize + p.1 as usize * w] = p.2;
 
-                        let ss = canvas_lock.get_map();
-
-                        println!("{}", ss[p.0 as usize][p.1 as usize]);
+                        println!("{} {} {}", p.0 as usize, p.1 as usize, canvas_lock.get_pixel_impl(p.0 as usize,  p.1 as usize));
 
                         canvas_lock
                             .set_pixel(p.0 as i32, p.1 as i32, color)
                             .unwrap();
 
-                        let ss = canvas_lock.get_map();
+                        println!("{} {} {}", p.0 as usize, p.1 as usize, canvas_lock.get_pixel_impl(p.0 as usize,  p.1 as usize));
 
-                        println!("{}", ss[p.0 as usize][p.1 as usize]);
+
                     }
                     false => (),
                 },
@@ -84,6 +87,7 @@ pub mod draw_triangle_threaded_with_zbuffer_texture {
         texture_path: PathBuf,
         image_canvas: &Arc<Mutex<Canvas>>,
     ) {
+
         let model = WavefronObject::new(obj_path);
 
         let canv = Arc::clone(image_canvas);
@@ -92,15 +96,15 @@ pub mod draw_triangle_threaded_with_zbuffer_texture {
 
         let (w, h) = canvas.get_size();
 
-        let zbuffer = vec![-f64::MAX; w * h];
+        let zbuffer = vec![-f32::MAX as f64; w * h];
 
         let face_vertices = model.get_vert_triplets_from_face_elements();
 
         let zbuffer_arc = Arc::new(Mutex::new(zbuffer));
 
         let face_textures = model.get_texture_triplets_from_elements();
-
         let texture = read_tga(texture_path);
+
 
         face_vertices
             .into_iter()
@@ -124,10 +128,11 @@ pub mod draw_triangle_threaded_with_zbuffer_texture {
 
                     let (u, v) = uv.unravel_uv_impl();
 
-                    points_uv.push(Point2(u as f64, v as f64));
+                    points_uv.push(Point2(u, v));
                 }
 
                 let uv_triplet = UVTriplet::from_vec(points_uv);
+
 
                 let pts = TriangleCoords3::from_vec(v3);
                 let texture_arc = Arc::new(texture.clone());

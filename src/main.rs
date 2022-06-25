@@ -28,13 +28,20 @@ fn test_wave_front() {
 }
 
 
+use draw_modes::draw_threaded_with_zbuffer_textured::draw_triangle_threaded_with_zbuffer_texture::shade_threaded_with_zbuffer_with_texture;
+
+
 
 fn main() {
     let mut image_canvas = crate::image_canvas::Canvas::new(800, 800, 20);
 
+    let obj_path = PathBuf::from("/media/chubak/MARK SOLID/naqshsmit2/resources/african_head.obj");
+    let texture_path = PathBuf::from("/media/chubak/MARK SOLID/naqshsmit2/resources/african_head_diffuse.tga");
 
    let arc_mutex_canv = Arc::new(Mutex::new(image_canvas));
 
+   shade_threaded_with_zbuffer_with_texture(obj_path, texture_path, &arc_mutex_canv);
+  
 
    crate::context::display_threaded_image_on_screen(arc_mutex_canv);
 }

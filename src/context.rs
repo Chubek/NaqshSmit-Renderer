@@ -44,7 +44,6 @@ pub fn display_image_on_screen(image: Canvas) {
         for (i, x_vec) in image_canvas.iter().enumerate() {
             for (j, c) in x_vec.into_iter().enumerate() {
                 canvas.set_draw_color(Color::RGB(*c, *c, *c));
-
                 canvas.draw_point(Point::new(w as i32 - j as i32, h as i32 - i as i32));
             }
         }

@@ -528,6 +528,7 @@ pub fn calculate_normal_and_intensity(v: Vec<Vertex>, light_dir: Point3<f64>) ->
     calculate_intensity(n, light_dir)
 }
 
+#[derive(Clone, Debug)]
 pub struct UVTriplet(Point2<f64>, Point2<f64>, Point2<f64>);
 
 impl UVTriplet {

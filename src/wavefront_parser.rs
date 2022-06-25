@@ -4,6 +4,8 @@ use std::fs;
 use std::path::PathBuf;
 use std::str::SplitWhitespace;
 
+
+#[derive(Debug)]
 pub struct TextureUV {
     u: f64,
     v: Option<f64>,
@@ -15,8 +17,8 @@ impl TextureUV {
         Self { u, v, w }
     }
 
-    pub fn unravel_uv_impl(&self) -> (usize, usize) {
-        (self.u as usize, self.v.unwrap() as usize)
+    pub fn unravel_uv_impl(&self) -> (f64, f64) {
+        (self.u, self.v.unwrap())
     }
 }
 
@@ -94,7 +96,6 @@ pub struct WavefronObject {
 impl WavefronObject {
     pub fn new(path: PathBuf) -> Self {
         let read_str = Self::read_to_string(path.clone());
-
         let mut v: Vec<Vertex> = vec![];
         let mut vt: Vec<TextureUV> = vec![];
         let mut vn: Vec<Point3<f64>> = vec![];
@@ -117,7 +118,6 @@ impl WavefronObject {
         });
 
         println!("Wavefront object {} loaded", path.display());
-
         Self {
             v,
             vt,
@@ -354,6 +354,7 @@ impl WavefronObject {
     }
 
     pub fn get_vert_triplets_from_face_elements(&self) -> Vec<Vec3Unsigned<usize>> {
+
         self.f
             .iter()
             .map(|x| x.vertex_triplet)

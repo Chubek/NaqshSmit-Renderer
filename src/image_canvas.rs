@@ -31,6 +31,8 @@ impl Canvas {
             convert_to_screen_coords(yi32),
         );
 
+        println!("{} {} {}", xi32, yi32, value);
+
 
         let Canvas(canvas) = self;
 
@@ -51,6 +53,12 @@ impl Canvas {
             }
             None => Err(ImageError::ErrorGettingRow),
         }
+    }
+
+    pub fn get_pixel_impl(&self, x: usize, y: usize) -> u8 {
+        let Canvas(canvas) = self;
+
+        canvas[x][y]
     }
 
     pub fn get_size(&self) -> (usize, usize) {
